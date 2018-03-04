@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//apis.google.com/js/platform.js?onload=start"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/inventory.css') }}">
+    <title>UI: Items</title>
+</head>
+
+<body class="background">
+    <main class="main">
+        {% include "header.html" %}
+        <div class="container">
+            <nav class="frame categories">
+                <button class="new">New</button>
+                
+                {% for c in categories %}
+
+                    <a href="/inventory/{{inventory_id}}/category/{{c.id}}/">
+                        <dt class="frame">c.name</dt>
+                    </a>
+
+                {% endfor %}
+
+                <form id="category-form" action="/inventory/{{inventory_id}}/category/new">
+                    <div class="form">
+                        <label for="name-input">Title:</label>
+                        <br>
+                        <input id="name-input" type="text" name="name">
+                        <br>
+                        <input class="submit" type="submit">
+                    </div>
+                </form>
+            </nav>
+            <nav class="frame items">
+                <button class="new">New</button>
+                
+                {% for i in items %}
+
+                <dt class="frame">i.name</dt>
+
+                {% endfor %}
+
+            </nav>
+
+            {% if item %}
+
+            <article class="description">
+                <div class="frame">
+                    <span>
+                        <img class="icon" src="">
+                        <button class="edit">Edit</button>{{ url_for('static', filename="img/{}/{}.png") }}
+                        <button class="delete">Delete</button>
+                    </span>
+
+                    <span>
+                        <h2>{{ item.name }}</h2>
+                        <p>{{ item.description }}</p>
+                    </span>
+                </div>
+                <form id="new-stuff" class="frame" action="">
+                    <div class="form">
+                        <label for="image-input">Image-URL:</label>
+                        <br>
+                        <input id="image-input" size="31" type="text" name="image">
+                        <br>
+                        <label for="name-input">Title:</label>
+                        <br>
+                        <input id="name-input" size="31" type="text" name="name">
+                        <br>
+                        <label for "trial">Description:</label>
+                        <br>
+                        <textarea id="trial" rows="8" cols="30" name="description" form="new-stuff"></textarea>
+                        <br>
+                        <input class="submit" type="submit">
+                    </div>
+                </form>
+            </article>
+
+            {% endif %}
+
+        </div>
+    </main>
+</body>
+
+</html>

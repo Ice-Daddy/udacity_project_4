@@ -7,20 +7,20 @@ Base = declarative_base()
 
 
 class InventoryType(Base):
-    __tablename__ = 'inventory'
+    __tablename__ = "inventory"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(32), nullable=False)
 
     def serialize(self):
         return {
-            'id': self.id,
-            'name': self.name
+            "id": self.id,
+            "name": self.name
         }
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(32), nullable=False)
@@ -28,53 +28,76 @@ class User(Base):
 
 
 class Category(Base):
-    __tablename__ = 'category'
+    __tablename__ = "category"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(32), nullable=False)
-    description = Column(String(256), nullable=False)
-    inventory_type_id = (Integer, ForeignKey('inventory.id'))
-    # inventory = relationship(InventoryType)
+    inventory_type_id = Column(Integer, ForeignKey("inventory.id"))
+    inventory = relationship(InventoryType)
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'inventory_type': self.inventory_type_id
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "inventory_type": self.inventory_type_id
         }
 
 
 class Item(Base):
-    __tablename__ = 'item'
+    __tablename__ = "item"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(32), nullable=False)
+    name = Column(String(60), nullable=False)
     description = Column(String(1024), nullable=False)
     image = Column(String(64), nullable=False)
-    ATK = Column(Integer, default=0)
-    DEF = Column(Integer, default=0)
-    category_id = Column(Integer, ForeignKey('category.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    # category = relationship(Category)
-    # user = relationship(User)
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
+    category = relationship(
+        "Category",
+        foreign_keys=[category_id]
+    )
 
     @property
     def serialize(self):
         return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'image_path': self.image,
-            'attack_value': self.ATK,
-            'defense_value': self.DEF,
-            'category_id': self.category_id,
-            'user_id': self.user_id
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "image_path": self.image,
+            "category_id": self.category_id,
         }
 
 
-engine = create_engine('sqlite:///InventoryCategories.db')
+class Skin(Base):
+    __tablename__ = "skin"
 
+    id = Column(Integer, primary_key=True)
+    title = Column(String(32))
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("User", foreign_keys=[user_id])
+
+    head_id = Column(Integer, ForeignKey("item.id"))
+    torso_id = Column(Integer, ForeignKey("item.id"))
+    legs_id = Column(Integer, ForeignKey("item.id"))
+    hands_id = Column(Integer, ForeignKey("item.id"))
+    feet_id = Column(Integer, ForeignKey("item.id"))
+    left_hand_id = Column(Integer, ForeignKey("item.id"))
+    right_hand_id = Column(Integer, ForeignKey("item.id"))
+    companion_id = Column(Integer, ForeignKey("item.id"))
+    head = relationship("Item", foreign_keys=[head_id])
+    torso = relationship("Item", foreign_keys=[torso_id])
+    legs = relationship("Item", foreign_keys=[legs_id])
+    hands = relationship("Item", foreign_keys=[hands_id])
+    feet = relationship("Item", foreign_keys=[feet_id])
+    left_hand = relationship("Item", foreign_keys=[left_hand_id])
+    right_hand = relationship("Item", foreign_keys=[right_hand_id])
+    companion = relationship("Item", foreign_keys=[companion_id])
+
+
+engine = create_engine("sqlite:///InventoryCategories.db")
+Base.metadata.create_all(engine)
+
+engine = create_engine("sqlite:///TEST-DB.db")
 Base.metadata.create_all(engine)

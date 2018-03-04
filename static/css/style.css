@@ -1,3 +1,105 @@
+@font-face {
+    font-family: 'diablo';
+    src: url(../fonts/avqest.ttf); 
+}
+
+@font-face {
+    font-family: 'arcade';
+    src: url(../fonts/arcadeclassic.ttf); 
+}
+
+@font-face {
+    font-family: 'droid';
+    src: url(../fonts/DisposableDroidBB.ttf);
+}
+
+@font-face {
+    font-family: 'droid';
+    src: url(../fonts/DisposableDroidBB_bld.ttf);
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'droid';
+    src: url(../fonts/DisposableDroidBB_ital.ttf);
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'droid';
+    src: url(../fonts/DisposableDroidBB_bldital.ttf);
+    font-weight: bold;
+    font-style: italic
+}
+
+.background {
+    background-color:  black;
+}
+
+.main {
+    margin: auto;
+    width: 800px;
+    max-width: 1200px;
+    background: url(../img/BG-small.png) no-repeat;
+    background-size: 100%;
+}
+
+a,
+dt,
+h3,
+button {
+    font-family: 'arcade';
+}
+
+h3 {
+    margin: 5px;
+}
+
+p,
+label {
+    font-family: 'droid';
+}
+
+h1,
+h2 {
+    font-family: 'diablo';
+}
+
 .container {
-    background-image: 
+    display: grid;
+    grid-gap: 5px;
+    height: 800px;
+}
+
+.frame {
+    border-bottom: 5px solid rgba(0,0,0,0.25);
+    border-right:  5px solid rgba(0,0,0,0.4);
+    border-top:    2px solid rgba(235,235,235,0.65);
+    border-left:   2px solid rgba(235,235,235,0.8);
+    padding: 5px;
+    display: flex;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.header {
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    background-color: rgba(0,0,0,0.65)
+}
+
+.signin {
+    display: flex;
+    padding: 5px;
+    background-color: blue;
+    border: 3px solid black;
+}
+
+.signin > * {
+    background: transparent;
+    border: none;
+    margin: auto 0;
+    color: lightblue;
+    font-family: 'arcade';
+    font-size: 18px;
 }

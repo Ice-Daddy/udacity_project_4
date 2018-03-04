@@ -1,7 +1,7 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .database_init import Base
+from database_init import Base
 
 
 class DBInteractor():
@@ -14,8 +14,10 @@ class DBInteractor():
         self.query = self.session.query(self.SQLclass)
 
     def add(self, **columns):
-        self.session.add(self.SQLclass(**columns))
+        entry = self.SQLclass(**columns)
+        self.session.add(entry)
         self.session.commit()
+        return entry
 
     def read(self):
         return self.query.all()
@@ -31,6 +33,10 @@ class DBInteractor():
     def update(self, attribute, need_update):
         self.filter(**attribute).update(need_update)
         self.session.commit()
+
+    def flush_all(self):
+        for row in self.read():
+            self.session.delete(row)
 
     def printThis(self):
         output = ""
