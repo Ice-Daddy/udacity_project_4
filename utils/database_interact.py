@@ -62,5 +62,5 @@ if __name__ == "__main__":
     from database_init import InventoryType, Category
     restDB = DBInteractor(InventoryType)
     menuDB = DBInteractor(Category)
-    menuDB.printThis()
-    restDB.printThis()
+    menuDB.print_this()
+    restDB.print_this()
