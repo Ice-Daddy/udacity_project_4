@@ -35,13 +35,11 @@ class Category(Base):
     inventory_type_id = Column(Integer, ForeignKey("inventory.id"))
     inventory = relationship(InventoryType)
 
-    @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description,
             "inventory_type": self.inventory_type_id
         }
 
@@ -51,15 +49,19 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(60), nullable=False)
-    description = Column(String(1024), nullable=False)
+    description = Column(String(512), nullable=False)
     image = Column(String(64), nullable=False)
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     category = relationship(
         "Category",
         foreign_keys=[category_id]
     )
+    user = relationship(
+        "User",
+        foreign_keys=[user_id]
+    )
 
-    @property
     def serialize(self):
         return {
             "id": self.id,

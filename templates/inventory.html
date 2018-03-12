@@ -3,13 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="//apis.google.com/js/platform.js?onload=start"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/inventory.css') }}">
-    <title>UI: Items</title>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <title>Ultimate Inventory</title>
 </head>
 
 <body class="background">
@@ -17,75 +18,250 @@
         {% include "header.html" %}
         <div class="container">
             <nav class="frame categories">
-                <button class="new">New</button>
-                
+                <button class="new new-category">New</button>
+
                 {% for c in categories %}
 
-                    <a href="/inventory/{{inventory_id}}/category/{{c.id}}/">
-                        <dt class="frame">c.name</dt>
+                <dt class="frame spread-apart">
+                    <a href="{{ url_for('show_category', inv_name=inv_name, category_id=c.id) }}">
+                        <h3>{{c.name}}</h3>
                     </a>
+                    <span>
+                        <div class="edit-ctgry" nbr="{{ c.id }}"><i class="fas fa-pencil-alt"></i></div>
+                        <div class="delete-ctgry" nbr="{{ c.id }}"><i class="fas fa-trash"></i></div>
+                    </span>
+                </dt>
 
                 {% endfor %}
 
-                <form id="category-form" action="/inventory/{{inventory_id}}/category/new">
-                    <div class="form">
+                <form id="ctgry-form" class="form hidden" action="/inventory/{{inv_name}}/category/new" method="POST">
+                    <div>
                         <label for="name-input">Title:</label>
                         <br>
-                        <input id="name-input" type="text" name="name">
+                        <input id="ctgry-name-input" type="text" name="name" width=31 required>
                         <br>
-                        <input class="submit" type="submit">
+                        <div class="spread-apart">
+                            <button type="submit">OK</button>
+                            <button class="cancel-ctgry" type="button">Cancel</button>
+                        </div>
                     </div>
                 </form>
             </nav>
             <nav class="frame items">
-                <button class="new">New</button>
-                
+                <button class="new new-item">New</button>
+
                 {% for i in items %}
-
-                <dt class="frame">i.name</dt>
-
+                <dt class="frame item" nbr="{{ i.id }}" <>{{i.name}}</dt>
                 {% endfor %}
-
             </nav>
 
-            {% if item %}
-
             <article class="description">
-                <div class="frame">
+
+                <div class="frame item-description {% if not item %} hidden {% endif %}">
                     <span>
-                        <img class="icon" src="">
-                        <button class="edit">Edit</button>{{ url_for('static', filename="img/{}/{}.png") }}
-                        <button class="delete">Delete</button>
+                        <img id="icon" src="{% if item %}{{ url_for('static', filename='img/{}/{}'.format(inv_name, item.image)) }}{% endif %}">
                     </span>
 
                     <span>
-                        <h2>{{ item.name }}</h2>
-                        <p>{{ item.description }}</p>
+                        <h3 id="name-title">{% if item %}{{ item.name }}{% endif %}</h3>
+                        <p id="description-text">{% if item %}{{ item.description }}{% endif %}</p>
                     </span>
+
+                    <span class="button-panel">
+                        <button type="button" class="edit-item">Edit</button>
+                        <button type="button" class="delete-item">Delete</button>
+                        <button type="button" class="equip-item">Equip</button>
+                    </span>
+
                 </div>
-                <form id="new-stuff" class="frame" action="">
+
+                <form id="item-form" class="frame hidden" action="/" method="POST">
                     <div class="form">
                         <label for="image-input">Image-URL:</label>
                         <br>
-                        <input id="image-input" size="31" type="text" name="image">
+                        <input id="image-input" size="32" type="text" name="image">
                         <br>
-                        <label for="name-input">Title:</label>
+                        <label for="item-name-input">Title:</label>
                         <br>
-                        <input id="name-input" size="31" type="text" name="name">
+                        <input id="item-name-input" size="32" type="text" name="name" required>
                         <br>
-                        <label for "trial">Description:</label>
+                        <label for "description-input">Description:</label>
                         <br>
-                        <textarea id="trial" rows="8" cols="30" name="description" form="new-stuff"></textarea>
+                        <textarea id="description-input" rows="8" cols="30" name="description" required></textarea>
                         <br>
-                        <input class="submit" type="submit">
+                        <div class="spread-apart">
+                            <button type="submit">Submit</button>
+                            <button class="cancel-item" type="button">Cancel</button>
+                        </div>
                     </div>
                 </form>
             </article>
 
-            {% endif %}
-
         </div>
     </main>
+
+    <script>
+        /*************************
+         * Get input from Python *
+         *************************/
+
+        var imgPath = "{{ url_for('static', filename='img/{}/'.format(inv_name)) }}";
+        var newCategoryActionPath = "{{ url_for('new_category', inv_name=inv_name) }}";
+        var categoryCRUDbasePath = "{{ url_for('show_inventory', inv_name=inv_name) }}category/";
+        
+        {% if category_id %}
+        var newItemActionPath = "{{ url_for('new_item', inv_name=inv_name, category_id=category_id) }}";
+        var itemCRUDbasePath = "{{ url_for('show_category', inv_name=inv_name, category_id=category_id) }}item/";
+        {% endif %}
+
+        var categories = {
+            {% for c in categories %}
+            "{{ c.id }}" : {
+                name: "{{ c.name }}"
+            },
+            {% endfor %}
+        };
+
+        var items = {
+            {% for i in items %}
+            "{{ i.id }}": {
+                id: "{{ i.id }}",
+                name: "{{ i.name }}",
+                description: "{{ i.description }}",
+                imagePath: imgPath + "{{ i.image }}"
+            },
+            {% endfor %}
+        };
+
+
+        /*****************
+         * HTML Elements *
+         *****************/
+
+        var $categoryForm = {
+            self: $('#ctgry-form'),
+            inputs: {
+                name: $('#ctgry-name-input')
+            },
+            prepareEdit: function(id) {
+                this.self.attr('action', categoryCRUDbasePath + id + '/edit');
+                this.inputs.name.val(categories[id].name);
+            },
+            prepareAdd: function() {
+                this.self.attr('action', newCategoryActionPath);
+                this.inputs.name.val("");
+            },
+            show: function() {this.self.removeClass('hidden')},
+            hide: function() {this.self.addClass('hidden')}
+        };
+
+        var $itemForm = {
+            self: $('#item-form'),
+            id: 0,
+            inputs: {
+                imagePath: $('#image-input'),
+                name: $('#item-name-input'),
+                description: $('#description-input')
+            },
+            prepareEdit: function(item) {
+                this.self.attr('action', itemCRUDbasePath + this.id + '/edit');
+                for (field in this.inputs) {;
+                    this.inputs[field].val(item[field]);
+                }
+                this.inputs.imagePath.attr('disabled', '');
+                this.inputs.imagePath.removeAttr('required');
+            },
+            prepareAdd: function() {
+                this.self.attr('action', newItemActionPath);
+                for (field in this.inputs) {
+                    this.inputs[field].val("");
+                }
+                this.inputs.imagePath.removeAttr('disabled');
+                this.inputs.imagePath.attr('required', '');
+            },
+            show: function() {this.self.removeClass('hidden')},
+            hide: function() {this.self.addClass('hidden')},
+            update: function(id) {
+                this.id = id;
+            }
+        };
+
+        var $itemDisplay = {
+            self: $('.item-description'),
+            image: $('#icon'),
+            title: $('#name-title'),
+            description: $('#description-text'),
+            update: function(item) {
+                this.self.removeClass('hidden');
+                this.image.attr('src', item.imagePath);
+                this.title.text(item.name)
+                this.description.text(item.description)
+            }
+        };
+
+
+        /*******************
+         * JQuery Methods *
+         *******************/
+
+        $('.new-category').click(function () {
+            var $form = $categoryForm;
+            $form.show();
+            $form.prepareAdd();
+        });
+
+        $('.edit-ctgry').click(function () {
+            var id = this.getAttribute("nbr");
+            var $form = $categoryForm;
+            $form.show();
+            $form.prepareEdit(id);
+        });
+
+        $('.delete-ctgry').click(function () {
+            var id = this.getAttribute("nbr");
+            $.post(categoryCRUDbasePath + id + "/delete");
+        });
+
+        $('.cancel-ctgry').click(function () {
+            $categoryForm.hide()
+        });
+
+        $('.item').click(function (e) {
+            var id = this.getAttribute('nbr');
+            var item = items[parseInt(id)];
+            $itemDisplay.update(item);
+            $itemForm.id = id;
+            $itemForm.hide();
+        });
+
+        $(".new-item").click(function () {
+            var $form = $itemForm;
+            $form.show();
+            $form.prepareAdd()
+        });
+
+        $('.edit-item').click(function () {
+            var $form = $itemForm;
+            var id = $form.id;
+            var item = items[id];
+            $form.show();
+            $form.prepareEdit(item);
+        });
+
+        $(".delete-item").click(function(){
+            var id = $itemForm.id;
+            $.post(itemCRUDbasePath + id + "/delete")
+        });
+
+        $('.cancel-item').click(function () {
+            $itemForm.hide();
+        });
+
+        $(".equip-item").click(function(){
+            var id = $itemForm.id;
+            $.post(itemCRUDbasePath + id + "/equip")
+        });
+    </script>
 </body>
 
 </html>

@@ -38,33 +38,24 @@ class DBInteractor():
         for row in self.read():
             self.session.delete(row)
 
-    def printThis(self):
+    def print_this(self):
         output = ""
         index = 1
         for row in self.read():
-            row_dict = {k: v for k, v in self.iteritems(row.__dict__) if k[0] != '_'}
+            row_dict = {k: v for k, v
+                        in row.__dict__.iteritems() if k[0] != '_'}
             output += "Row {}:\n".format(str(index))
-            for k, v in self.iteritems(row_dict):
+            for k, v in row_dict.iteritems():
                 output += "    {}: {}\n".format(k, v).encode('utf-8')
             index += 1
             output += "\n"
         print(output)
 
-    def flaskThis(self):
-        output = ""
-        index = 1
-        for row in self.read():
-            row_dict = {k: v for k, v in self.iteritems(row.__dict__) if k[0] != '_'}
-            output += "Row {}:<br>".format(str(index))
-            for k, v in self.iteritems(row_dict):
-                output += "    {}: {}<br>".format(k, v)
-            index += 1
-            output += "<br>"
-        return output
-
-    @staticmethod
-    def iteritems(dct):
-        return ((k, dct[k]) for k in dct)
+    def serialize_this(self):
+        if hasattr(self.SQLclass, "serialize"):
+            for row in self.read():
+                print row.serialize()
+        
 
 
 if __name__ == "__main__":

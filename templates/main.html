@@ -19,43 +19,43 @@
         <div class="container">
             <div class="frame character">
                 <a class="frame head" href="/inventory/head/">
-                    <p>Head</p>
-                    <img class="body-part" src="../static/img/head/{{ images['head'] }}">
+                    <h3>Head</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/head/' + session['head']['image']) }}">
                 </a>
                 <a class="frame torso" href="/inventory/torso/">
-                    <p>Torso</p>
-                    <img class="body-part" src="../static/img/torso/{{ images['torso'] }}">
+                    <h3>Torso</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/torso/' + session['torso']['image']) }}">
                 </a>
                 <a class="frame left-hand"href="/inventory/left_hand/">
-                    <p>Laft Hand</p>
-                    <img class="body-part" src="../static/img/left-hand/{{ images['left_hand'] }}">
+                    <h3>Left Hand</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/left_hand/' + session['left_hand']['image']) }}">
                 </a>
                 <a class="frame right-hand" href="/inventory/right_hand/">
-                    <p>Right Hand</p>
-                    <img class="body-part" src="../static/img/right-hand/{{ images['right_hand'] }}">
+                    <h3>Right Hand</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/right_hand/' + session['right_hand']['image']) }}">
                 </a>
                 <a class="frame legs" href="/inventory/legs/">
-                    <p>Legs</p>
-                    <img class="body-part" src="../static/img/legs/{{ images['legs'] }}">
+                    <h3>Legs</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/legs/' + session['legs']['image']) }}">
                 </a>
                 <a class="frame hands" href="/inventory/hands/">
-                    <p>Hands</p>
-                    <img class="body-part" src="../static/img/hands/{{ images['hands'] }}">
+                    <h3>Hands</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/hands/' + session['hands']['image']) }}">
                 </a>
                 <a class="frame feet" href="/inventory/feet/">
-                    <p>Feet</p>
-                    <img class="body-part" src="../static/img/feet/{{ images['feet'] }}">
+                    <h3>Feet</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/feet/' + session['feet']['image']) }}">
                 </a>
                 <a class="frame companion" href="/inventory/companion/">
-                    <p>Companion</p>
-                    <img class="body-part" src="../static/img/companion/{{ images['companion'] }}">
+                    <h3>Companion</h3>
+                    <img class="body-part" src="{{ url_for('static', filename='img/companion/' + session['companion']['image']) }}">
                 </a>
             </div>
             <nav class="frame skins">
                 <dl>
                     {% for s in skins %}
                     <dt class="frame">
-                        <a href="/inventory/?skin={{ s.id }}">{{s.title}}</a>
+                        <a href="{{ url_for('open_skin', skin_id=s.id) }}">{{s.title}}</a>
                     </dt>
                     {% endfor %}
                 </dl>

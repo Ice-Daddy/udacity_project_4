@@ -1,6 +1,8 @@
 <header class="flex frame header">
     <div>
-        <img src="{{ url_for('static', filename='img/Logo.png') }}">
+        <a href="{{ url_for('main_page') }}">
+            <img src="{{ url_for('static', filename='img/Logo.png') }}">
+        </a>
     </div>
     <div class="user">
         {% if session.username %} 

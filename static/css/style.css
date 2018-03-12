@@ -46,12 +46,23 @@
 
 a,
 dt,
-h3,
 button {
     font-family: 'arcade';
+    text-decoration: none;
+}
+
+a:link,
+a:visited {
+    color: black
+}
+
+a:hover,
+a:active {
+    color: #383838;
 }
 
 h3 {
+    font-family: 'diablo';
     margin: 5px;
 }
 
@@ -82,10 +93,14 @@ h2 {
 }
 
 .header {
-    flex-flow: row nowrap;
     align-items: flex-end;
     justify-content: space-between;
     background-color: rgba(0,0,0,0.65)
+}
+
+.spread-apart {
+    display: flex;
+    justify-content: space-between;
 }
 
 .signin {

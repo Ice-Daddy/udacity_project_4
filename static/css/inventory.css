@@ -15,28 +15,50 @@
     grid-column: 2 / 3;
 }
 
+.item {
+    cursor: pointer;
+}
+
 .description {
     grid-row: 1 / 2;
     grid-column: 3 / 4;
     flex-direction: row;
 }
 
-.icon {
+#icon {
     padding: 10px;
 }
 
-.edit {
-    margin: 0 10px;
+.button-panel {
+    width: 62px;
+    margin: 12px;
+}
+
+.item-description {
+    justify-content: space-between;
+}
+
+button {
+    width: 62px;
+    margin: 5px 10px;
     background: transparent;
+    cursor: pointer;
+}
+
+.edit {
     border: 3px solid blue;
     color: blue;
 }
 
 .delete {
-    margin: 0 10px;
-    background: transparent;
     border: 3px solid red;
     color: red;
+}
+
+.equip {
+    background: rgb(102, 76, 25);
+    border: 3px solid rgb(102, 76, 25);
+    color: white;
 }
 
 .new {
@@ -46,7 +68,7 @@
 }
 
 .form {
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
     margin: 5px auto;
     padding: 5px 10px;
 }
@@ -60,9 +82,27 @@ textarea {
     font-family: 'droid';
     outline: none;
     border: none;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .submit {
     border: 3px solid #555;
+}
+
+.hidden {
+    display: none;
+}
+
+.svg-inline--fa {
+    padding: 3px;
+    color: #666;
+    cursor: pointer;
+}
+
+.fa-pencil-alt:hover {
+    color: blue;
+}
+
+.fa-trash:hover {
+    color: red;
 }

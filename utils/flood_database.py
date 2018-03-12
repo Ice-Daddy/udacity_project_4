@@ -32,7 +32,7 @@ if __name__ == '__main__':
             'name': 'left_hand'
         },
         {
-            'name': 'Companion'
+            'name': 'companion'
         }
     ]
 
