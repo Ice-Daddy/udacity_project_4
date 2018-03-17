@@ -76,8 +76,8 @@ class Skin(Base):
     __tablename__ = "skin"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(32))
-    user_id = Column(Integer, ForeignKey("user.id"))
+    title = Column(String(32), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     user = relationship("User", foreign_keys=[user_id])
 
     head_id = Column(Integer, ForeignKey("item.id"))
