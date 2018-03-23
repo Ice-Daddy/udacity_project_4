@@ -38,59 +38,20 @@
     justify-content: space-between;
 }
 
-button {
-    width: 62px;
-    margin: 5px 10px;
-    background: transparent;
-    cursor: pointer;
-}
-
-.edit {
-    border: 3px solid blue;
-    color: blue;
-}
-
-.delete {
-    border: 3px solid red;
-    color: red;
-}
-
-.equip {
+.equip-item {
     background: rgb(102, 76, 25);
     border: 3px solid rgb(102, 76, 25);
     color: white;
-}
-
-.new {
-    background-color: #3f9e25;
-    border: 3px solid #3f9e25;
-    color: #eee;
-}
-
-.form {
-    background-color: rgba(0, 0, 0, 0.1);
-    margin: 5px auto;
-    padding: 5px 10px;
 }
 
 input {
     padding: 2px;
 }
 
-input,
-textarea {
-    font-family: 'droid';
-    outline: none;
-    border: none;
-    background-color: rgba(0, 0, 0, 0.2);
-}
+
 
 .submit {
     border: 3px solid #555;
-}
-
-.hidden {
-    display: none;
 }
 
 .svg-inline--fa {

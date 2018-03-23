@@ -18,25 +18,14 @@
         {% include "header.html" %}
         <div class="container">
             <nav class="frame categories">
+                {% if session["user_id"] %}
                 <button class="new new-category">New</button>
+                {% endif %}
 
-                {% for c in categories %}
-
-                <dt class="frame spread-apart">
-                    <a href="{{ url_for('show_category', inv_name=inv_name, category_id=c.id) }}">
-                        <h3>{{c.name}}</h3>
-                    </a>
-                    <span>
-                        <div class="edit-ctgry" nbr="{{ c.id }}"><i class="fas fa-pencil-alt"></i></div>
-                        <div class="delete-ctgry" nbr="{{ c.id }}"><i class="fas fa-trash"></i></div>
-                    </span>
-                </dt>
-
-                {% endfor %}
-
+                {% if session["user_id"] %}
                 <form id="ctgry-form" class="form hidden" action="/inventory/{{inv_name}}/category/new" method="POST">
                     <div>
-                        <label for="name-input">Title:</label>
+                        <label for="ctgry-name-input">Title:</label>
                         <br>
                         <input id="ctgry-name-input" type="text" name="name" width=31 required>
                         <br>
@@ -46,55 +35,105 @@
                         </div>
                     </div>
                 </form>
+                {% endif %}
+
+                {% for c in categories %}
+                <dt class="frame spread-apart">
+                    <a href="{{ url_for('show_category', inv_name=inv_name, category_id=c.id) }}">
+                        <h3>{{c.name}}</h3>
+                    </a>
+                    {% if session["user_id"] and c.user_id == session["user_id"] %}
+                    <span>
+                        <div class="edit-ctgry" nbr="{{ c.id }}"><i class="fas fa-pencil-alt"></i></div>
+                        <div class="delete-ctgry" nbr="{{ c.id }}"><i class="fas fa-trash"></i></div>
+                    </span>
+                    {% endif %}
+                </dt>
+                {% endfor %}
             </nav>
             <nav class="frame items">
+                {% if session["user_id"] %}
                 <button class="new new-item">New</button>
+                {% endif %}
 
                 {% for i in items %}
-                <dt class="frame item" nbr="{{ i.id }}" <>{{i.name}}</dt>
+                <a href="{{ url_for('show_item_details', inv_name=inv_name, category_id=category_id, item_id=i.id) }}">
+                    <dt class="frame item" nbr="{{ i.id }}">{{i.name}}</dt>
+                </a> 
                 {% endfor %}
             </nav>
 
             <article class="description">
 
-                <div class="frame item-description {% if not item %} hidden {% endif %}">
+                {% if item %}
+                <div class="frame item-description">
                     <span>
-                        <img id="icon" src="{% if item %}{{ url_for('static', filename='img/{}/{}'.format(inv_name, item.image)) }}{% endif %}">
+                        <img id="icon" src="{{ url_for('static', filename='img/{}/{}'.format(inv_name, item.image)) }}">
                     </span>
 
                     <span>
-                        <h3 id="name-title">{% if item %}{{ item.name }}{% endif %}</h3>
-                        <p id="description-text">{% if item %}{{ item.description }}{% endif %}</p>
+                        <h3 id="name-title">{{ item.name }}</h3>
+                        <p id="description-text">{{ item.description }}</p>
                     </span>
 
+                    {% if session["user_id"] %}
                     <span class="button-panel">
+                        {% if item.user_id == session["user_id"] %}
                         <button type="button" class="edit-item">Edit</button>
                         <button type="button" class="delete-item">Delete</button>
+                        {% endif %}
                         <button type="button" class="equip-item">Equip</button>
                     </span>
+                    {% endif %}
 
                 </div>
+                {% endif %}
 
-                <form id="item-form" class="frame hidden" action="/" method="POST">
+                {% if session["user_id"] %}
+                <form id="add-item-form" class="frame hidden" action="{{ url_for('add_item',inv_name=inv_name, category_id=category_id) }}" method="POST">
                     <div class="form">
-                        <label for="image-input">Image-URL:</label>
+                        <label for="add-image-input">Image-URL:</label>
                         <br>
-                        <input id="image-input" size="32" type="text" name="image">
+                        <input id="add-image-input" size="32" type="text" name="image" required>
                         <br>
-                        <label for="item-name-input">Title:</label>
+                        <label for="add-item-name-input">Title:</label>
                         <br>
-                        <input id="item-name-input" size="32" type="text" name="name" required>
+                        <input id="add-name-input" size="32" type="text" name="name" required>
                         <br>
-                        <label for "description-input">Description:</label>
+                        <label for="add-description-input">Description:</label>
                         <br>
-                        <textarea id="description-input" rows="8" cols="30" name="description" required></textarea>
+                        <textarea id="add-description-input" rows="8" cols="30" name="description" required></textarea>
                         <br>
                         <div class="spread-apart">
-                            <button type="submit">Submit</button>
+                            <input class"cancel-item" type="submit" value="Add">
                             <button class="cancel-item" type="button">Cancel</button>
                         </div>
                     </div>
                 </form>
+
+                {% if item %}
+                <form id="edit-item-form" class="frame hidden" action="{{ url_for('edit_item', inv_name=inv_name, category_id=category_id, item_id=item.id) }}" method="POST">
+                    <div class="form">
+                        <label for="image-input">Image-URL:</label>
+                        <br>
+                        <input id="image-input" size="32" type="text" name="image" value="{{ item.image }}" disabled>
+                        <br>
+                        <label for="item-name-input">Title:</label>
+                        <br>
+                        <input id="item-name-input" size="32" type="text" name="name" value="{{ item.name }}" required>
+                        <br>
+                        <label for="description-input">Description:</label>
+                        <br>
+                        <textarea id="description-input" rows="8" cols="30" name="description" value="{{ item.description }}" required></textarea>
+                        <br>
+                        <div class="spread-apart">
+                            <input class"cancel-item" type="submit" value="Edit">
+                            <button class="cancel-item" type="button">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+                {% endif %}
             </article>
 
         </div>
@@ -103,7 +142,7 @@
     <script>
         /*************************
          * Get input from Python *
-         *************************/
+         *************************
 
         var imgPath = "{{ url_for('static', filename='img/{}/'.format(inv_name)) }}";
         var newCategoryActionPath = "{{ url_for('new_category', inv_name=inv_name) }}";
@@ -128,7 +167,8 @@
                 id: "{{ i.id }}",
                 name: "{{ i.name }}",
                 description: "{{ i.description }}",
-                imagePath: imgPath + "{{ i.image }}"
+                imagePath: imgPath + "{{ i.image }}",
+                user_id: {{ i.user_id }}
             },
             {% endfor %}
         };
@@ -136,7 +176,7 @@
 
         /*****************
          * HTML Elements *
-         *****************/
+         *****************
 
         var $categoryForm = {
             self: $('#ctgry-form'),
@@ -157,7 +197,11 @@
 
         var $itemForm = {
             self: $('#item-form'),
+            {% if item %}
+            id: {{ item.id }},
+            {% else %}
             id: 0,
+            {% endif %}
             inputs: {
                 imagePath: $('#image-input'),
                 name: $('#item-name-input'),
@@ -191,18 +235,20 @@
             image: $('#icon'),
             title: $('#name-title'),
             description: $('#description-text'),
+            deleteButton: $(".delete-item"),
+            editButton: $(".edit-item"),
             update: function(item) {
                 this.self.removeClass('hidden');
                 this.image.attr('src', item.imagePath);
-                this.title.text(item.name)
-                this.description.text(item.description)
+                this.title.text(item.name);
+                this.description.text(item.description);
             }
         };
 
 
         /*******************
          * JQuery Methods *
-         *******************/
+         *******************
 
         $('.new-category').click(function () {
             var $form = $categoryForm;
@@ -219,7 +265,15 @@
 
         $('.delete-ctgry').click(function () {
             var id = this.getAttribute("nbr");
-            $.post(categoryCRUDbasePath + id + "/delete");
+            if (confirm("Are you sure that you want to delete this category?")){
+                $.ajax({
+                    url: categoryCRUDbasePath + id + "/delete",
+                    type: "POST",
+                    success: function(response) {
+                        window.location = response;
+                    }
+                });
+            }
         });
 
         $('.cancel-ctgry').click(function () {
@@ -250,17 +304,71 @@
 
         $(".delete-item").click(function(){
             var id = $itemForm.id;
-            $.post(itemCRUDbasePath + id + "/delete")
+            console.log("Delete Time with ID " + id);
+            if (confirm("Are you sure that you want to delete this item?")){
+                $.ajax({
+                    url: itemCRUDbasePath + id + "/delete",
+                    type: "POST",
+                    success: function(response) {
+                        window.location = response;
+                    }
+                });
+            }
         });
 
         $('.cancel-item').click(function () {
             $itemForm.hide();
-        });
+        });*/
+        {% if item %}
+
+        var itemID = {{ item.id }};
+        var equipURL = "{{ url_for("equip_item", inv_name=inv_name, category_id=category_id, item_id=item.id) }}";
+
+        var $itemForm = {
+            self: $('#item-form'),
+            id: itemID,
+            inputs: {
+                imagePath: $('#image-input'),
+                name: $('#item-name-input'),
+                description: $('#description-input')
+            },
+            prepareEdit: function(item) {
+                this.self.attr('action', itemCRUDbasePath + this.id + '/edit');
+                for (field in this.inputs) {;
+                    this.inputs[field].val(item[field]);
+                }
+                this.inputs.imagePath.attr('disabled', '');
+                this.inputs.imagePath.removeAttr('required');
+            },
+            prepareAdd: function() {
+                this.self.attr('action', newItemActionPath);
+                for (field in this.inputs) {
+                    this.inputs[field].val("");
+                }
+                this.inputs.imagePath.removeAttr('disabled');
+                this.inputs.imagePath.attr('required', '');
+            },
+            show: function() {this.self.removeClass('hidden')},
+            hide: function() {this.self.addClass('hidden')},
+            update: function(id) {
+                this.id = id;
+            }
+        };
 
         $(".equip-item").click(function(){
-            var id = $itemForm.id;
-            $.post(itemCRUDbasePath + id + "/equip")
+            $.ajax({
+                url: equipURL,
+                type: "POST",
+                success: function(response) {
+                    window.location = response;
+                }
+            });
         });
+
+        $(".cancel-item").click(function(){
+            $(".item.form").hide();
+        })
+        {% endif %}
     </script>
 </body>
 

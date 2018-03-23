@@ -29,10 +29,7 @@ body_parts = ["head", "torso", "legs", "hands", "feet",
 def create_csrf_token():
     if not login_session.get("state"):
         for part in body_parts:
-            login_session[part] = {
-                "image": "default.png",
-                "id": 0
-            }
+            login_session[part] = 0
     state = sha256(urandom(1024)).hexdigest()
     login_session["state"] = state
 
@@ -83,22 +80,54 @@ def gdisconnect():
 # JSON API methods #
 ####################
 
-@app.route("/api/inventory/")
-def list_inventory_types():
-    inventory_types = inventoryDB.read()
-    return jsonify(inventory_types=[i.serialize for i in inventory_types])
+@app.route("/admin")
+def print_session():
+    create_csrf_token()
+    output = "{<br>"
+    for x in login_session.__iter__():
+        output += "    {}: {}<br>".format(x, login_session[x])
+    output += "<br><br><br>"
+    character = get_character_inventory()
+    for x in character.__iter__():
+        output += "    {}: {}<br>".format(x, character[x])
+    itemDB.print_this()
+    return output
+
+
+@app.route("/api/all_categories/")
+def list_all_categories():
+    categories = categoryDB.read()
+    return jsonify({c.id: c.serialize() for c in categories})
+
+
+@app.route("/api/all_items/")
+def list_all_items():
+    items = itemDB.read()
+    return jsonify({i.id: i.serialize() for i in items})
 
 
 @app.route("/api/inventory/<string:inv_name>/categories/")
-def list_categories(inv_name):
-    categories = categoryDB.filter(inventory_type_id=inv_name).all()
-    return jsonify(item_categories=[c.serialize for c in categories])
+def list_categories_of_inventory(inv_name):
+    id = get_inventory_type_id_by_inventory_name(inv_name)
+    categories = categoryDB.filter(inventory_type_id=id).all()
+    return jsonify(item_categories=[c.serialize() for c in categories])
+
+
+@app.route("/api/inventory/<string:inv_name>/items/")
+def list_items_of_inventory(inv_name):
+    id = get_inventory_type_id_by_inventory_name(inv_name)
+    print(id)
+    category_ids = categoryDB.session.query(Category.id).\
+        filter(Category.inventory_type_id == id)
+    print(category_ids)
+    items = itemDB.session.query(Item).filter(Item.category_id.in_(category_ids))
+    return jsonify(items=[i.serialize() for i in items])
 
 
 @app.route("/api/inventory/<string:inv_name>/category/<int:category_id>/")
 def list_items_of_category(inv_name, category_id):
-    category = categoryDB.filter(id=category_id).one()
-    return jsonify(restaurants=[c.serialize for c in category])
+    items = itemDB.filter(category_id=category_id).all()
+    return jsonify(items=[i.serialize() for i in items])
 
 
 ############################
@@ -109,9 +138,11 @@ def list_items_of_category(inv_name, category_id):
 def main_page():
     create_csrf_token()
     skins = skinDB.read()
+    character = get_character_inventory()
     return render_template(
         "main.html",
         skins=skins,
+        character=character,
         session=login_session
     )
 
@@ -124,24 +155,33 @@ def main_page():
 def open_skin(skin_id):
     create_csrf_token()
     get_images_by_skin_id(skin_id)
+    character = get_character_inventory()
     skins = skinDB.read()
     return render_template(
         "main.html",
         session=login_session,
-        skins=skins
+        character=character,
+        skins=skins,
+        skin_id=skin_id
     )
 
 
 @app.route(
     "/inventory/skin/save", methods=["POST"])
-def save_skin(skin_id):
-    pass
+def save_skin():
+    current_skin = {body_part + "_id": login_session[body_part]
+                    for body_part in body_parts}
+    current_skin["user_id"] = 1 #TODO login_session["user_id"]
+    current_skin["title"] = request.form["name"]
+    skinDB.add(**current_skin)
+    return redirect(url_for("main_page"))
 
 
 @app.route(
     "/inventory/skin/<int:skin_id>/delete", methods=["POST"])
-def deflete_skin(skin_id):
-    pass
+def delete_skin(skin_id):
+    skinDB.delete(id=skin_id)
+    return "success"
 
 
 def get_current_skin():
@@ -149,14 +189,40 @@ def get_current_skin():
             for body_part in body_parts}
 
 
+def get_character_inventory():
+    return {body_part: get_item_info_by_body_part(body_part)
+            for body_part in body_parts}
+
+
+def get_item_info_by_body_part(body_part):
+    id = login_session[body_part]
+    item_info = item_or_default_item(id)
+    return item_info
+
+
+def item_or_default_item(id):
+    print(id)
+    if id == 0:
+        return {
+            "image": "default.png",
+            "description": ""
+        }
+    item = itemDB.filter(id=id).one()
+    return {
+        "image": item.image,
+        "description": item.description
+    }
+
+
 def get_images_by_skin_id(skin_id):
     item_set = skinDB.filter(id=skin_id).one()
     for body_part in body_parts:
-        img_file = getattr(item_set, body_part).image
-        if img_file:
-            login_session[body_part]["image"] = img_file
-        else:
-            login_session[body_part]["image"] = "default.png"
+        try:
+            id = getattr(item_set, body_part).id
+            login_session[body_part] = id
+        except AttributeError:
+            login_session[body_part] = 0
+    print(login_session)
 
 
 ################################
@@ -167,11 +233,13 @@ def get_images_by_skin_id(skin_id):
 def show_inventory(inv_name):
     create_csrf_token()
     categories = get_categories_by_inventory_name(inv_name)
+    authorized = get_authorized_entities(categories)
     return render_template(
         "inventory.html",
         session=login_session,
         inv_name=inv_name,
         categories=categories,
+        authorized=authorized,
         items=[]
     )
 
@@ -182,6 +250,7 @@ def show_category(inv_name, category_id):
     categories = get_categories_by_inventory_name(inv_name)
     items = get_items_by_category_id(category_id)
     item = get_item_by_item_id(request.args.get("item"))
+    authorized = get_authorized_entities(categories, items)
     return render_template(
         "inventory.html",
         category_id=category_id,
@@ -189,7 +258,8 @@ def show_category(inv_name, category_id):
         inv_name=inv_name,
         item=item,
         categories=categories,
-        items=items
+        items=items,
+        authorized=authorized
     )
 
 
@@ -200,23 +270,22 @@ def new_category(inv_name):
     inventory_id = get_inventory_type_id_by_inventory_name(inv_name)
     ctgry = categoryDB.add(
         name=request.form["name"],
+        user_id=1, #TODO login_session["user_id"]
         inventory_type_id=inventory_id
     )
     flash("New Category {} added.".format(request.form["name"]))
     return redirect(url_for(
-        "show_category", inv_name=inv_name, category_id=ctgry.id
-    ))
+        "show_category", inv_name=inv_name, category_id=ctgry.id))
 
 
 @app.route(
     "/inventory/<string:inv_name>/category/<int:category_id>/edit",
     methods=["POST"])
 def edit_category(inv_name, category_id):
-    updates = parse_form(request.form)
+    updates = filter_form(request.form)
     categoryDB.update({"id": category_id}, updates)
     return redirect(url_for(
-        "show_category", inv_name=inv_name, category_id=category_id
-    ))
+        "show_category", inv_name=inv_name, category_id=category_id))
 
 
 @app.route(
@@ -226,11 +295,21 @@ def delete_category(inv_name, category_id):
     categoryDB.delete(id=category_id)
     for item in get_items_by_category_id(category_id):
         itemDB.delete(id=item.id)
-    return redirect(url_for(
+    return url_for(
         "show_inventory",
         inv_name=inv_name
-    ), code=303)
+    )
 
+def get_authorized_entities(categories, items=[]):
+    user_id = login_session.get("user_id")
+    authorized_categories = [c.id for c in categories
+                              if c.user_id == user_id]
+    authorized_items = [i.id for i in items
+                              if i.user_id == user_id]
+    return {
+        "categories": authorized_categories,
+        "items": authorized_items
+    }
 
 #####################
 # Single Item Layer #
@@ -257,18 +336,18 @@ def show_item_details(inv_name, category_id, item_id):
     methods=["POST"])
 def equip_item(inv_name, category_id, item_id):
     image = itemDB.filter(id=item_id).one().image
-    login_session[inv_name] = image
-    return redirect(url_for("main_page"))
+    login_session[inv_name] = item_id
+    return url_for("main_page")
 
 
 @app.route(
     "/inventory/<string:inv_name>/category/<int:category_id>/item/new",
     methods=["POST"])
 def new_item(inv_name, category_id):
-    form = parse_form(request.form)
+    form = filter_form(request.form)
     try:
         form["image"] = get_and_store_picture(form["image"], inv_name)
-    except IOError:
+    except IOError or ValueError:
         return redirect(url_for(
             "show_category",
             inv_name=inv_name,
@@ -285,6 +364,7 @@ def new_item(inv_name, category_id):
 
 def insert_new_item_to_database(form, category_id):
     form["category_id"] = category_id
+    form["user_id"] = 1 #TODO login_session["user_id"]
     return itemDB.add(**form)
 
 
@@ -296,18 +376,18 @@ def get_and_store_picture(url, inv_name):
 
 
 @app.route(
-    "/inventory/<string:inv_name>/category/<int:category_id>/" +
+    "/inventory/<string:inv_name>/category/<int:category_id>/"
     "item/<int:item_id>/edit",
     methods=["POST"])
 def edit_item(inv_name, category_id, item_id):
-    updates = parse_form(request.form)
+    updates = filter_form(request.form)
     itemDB.update({"id": item_id}, updates)
-    return redirect(url_for(
+    return url_for(
         "show_item_details",
         inv_name=inv_name,
         category_id=category_id,
         item_id=item_id
-    ))
+    )
 
 
 @app.route(
@@ -315,14 +395,16 @@ def edit_item(inv_name, category_id, item_id):
     "item/<int:item_id>/delete",
     methods=["POST"])
 def delete_item(inv_name, category_id, item_id):
+    print("Delete Item with ID " + str(item_id))
     item_name = get_item_by_item_id(item_id).image
     remove_picture("img/{}/{}".format(inv_name, item_name))
+    remove_item_from_skins(inv_name, item_id)
     itemDB.delete(id=item_id)
-    return redirect(url_for(
+    return url_for(
         "show_category",
         inv_name=inv_name,
         category_id=category_id
-    ))
+    )
 
 
 ##################
@@ -370,8 +452,14 @@ def add_new_picture(url, path):
 
 def remove_picture(path):
     remove("./" + url_for(
-        "static", filename=path
-    ))
+        "static", filename=path))
+
+
+def remove_item_from_skins(inv_name, item_id):
+    inv_id = "{}_id".filter(inv_name)
+    skinDB.session.query(Skin).filter(
+        getattr(Skin, inv_id) == item_id
+    ).update({inv_id: 0})
 
 
 # user handling
@@ -399,7 +487,7 @@ def createUser(login_session):
 
 # misc
 
-def parse_form(form):
+def filter_form(form):
     return {field: entry
             for field, entry in form.iteritems() if entry}
 

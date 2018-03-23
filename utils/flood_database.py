@@ -46,35 +46,43 @@ if __name__ == '__main__':
     categories = [
         {
             'name': 'Historical Helmets',
-            'inventory_type_id': 1
+            'inventory_type_id': 1,
+            'user_id': 1
         },
         {
             'name': 'T-shirts',
-            'inventory_type_id': 2
+            'inventory_type_id': 2,
+            'user_id': 1
         },
         {
             'name': '80s',
-            'inventory_type_id': 3
+            'inventory_type_id': 3,
+            'user_id': 1
         },
         {
             'name': 'Winter Gloves',
-            'inventory_type_id': 4
+            'inventory_type_id': 4,
+            'user_id': 1
         },
         {
             'name': 'Sport shoes',
-            'inventory_type_id': 5
+            'inventory_type_id': 5,
+            'user_id': 1
         },
         {
             'name': 'Tools',
-            'inventory_type_id': 6
+            'inventory_type_id': 6,
+            'user_id': 1
         },
         {
             'name': 'Instruments',
-            'inventory_type_id': 7
+            'inventory_type_id': 7,
+            'user_id': 1
         },
         {
             'name': 'Pokemon',
-            'inventory_type_id': 8
+            'inventory_type_id': 8,
+            'user_id': 1
         }
     ]
 

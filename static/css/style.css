@@ -38,8 +38,7 @@
 
 .main {
     margin: auto;
-    width: 800px;
-    max-width: 1200px;
+    width: 960px;
     background: url(../img/BG-small.png) no-repeat;
     background-size: 100%;
 }
@@ -76,10 +75,28 @@ h2 {
     font-family: 'diablo';
 }
 
+dt {
+    width: 180px;
+}
+
+.new {
+    background-color: #3f9e25;
+    border: 3px solid #3f9e25;
+    color: #eee;
+}
+
 .container {
     display: grid;
     grid-gap: 5px;
     height: 800px;
+}
+
+button {
+    min-width: 70px;
+    margin: 5px 5px;
+    font-size: 16px;
+    background: transparent;
+    cursor: pointer;
 }
 
 .frame {
@@ -103,6 +120,18 @@ h2 {
     justify-content: space-between;
 }
 
+.edit,
+.edit-item {
+    border: 3px solid blue;
+    color: blue;
+}
+
+.delete,
+.delete-item{
+    border: 3px solid red;
+    color: red;
+}
+
 .signin {
     display: flex;
     padding: 5px;
@@ -117,4 +146,22 @@ h2 {
     color: lightblue;
     font-family: 'arcade';
     font-size: 18px;
+}
+
+input,
+textarea {
+    font-family: 'droid';
+    outline: none;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.hidden {
+    display: none;
+}
+
+.form {
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 5px auto;
+    padding: 5px 10px;
 }

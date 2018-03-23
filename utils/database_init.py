@@ -33,7 +33,12 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(32), nullable=False)
     inventory_type_id = Column(Integer, ForeignKey("inventory.id"))
-    inventory = relationship(InventoryType)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+
+    inventory = relationship(
+        "InventoryType", foreign_keys=[inventory_type_id])
+    user = relationship(
+        "User", foreign_keys=[user_id])
 
     def serialize(self):
         """Return object data in easily serializeable format"""
@@ -53,14 +58,11 @@ class Item(Base):
     image = Column(String(64), nullable=False)
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+
     category = relationship(
-        "Category",
-        foreign_keys=[category_id]
-    )
+        "Category", foreign_keys=[category_id])
     user = relationship(
-        "User",
-        foreign_keys=[user_id]
-    )
+        "User", foreign_keys=[user_id])
 
     def serialize(self):
         return {
@@ -88,18 +90,25 @@ class Skin(Base):
     left_hand_id = Column(Integer, ForeignKey("item.id"))
     right_hand_id = Column(Integer, ForeignKey("item.id"))
     companion_id = Column(Integer, ForeignKey("item.id"))
-    head = relationship("Item", foreign_keys=[head_id])
-    torso = relationship("Item", foreign_keys=[torso_id])
-    legs = relationship("Item", foreign_keys=[legs_id])
-    hands = relationship("Item", foreign_keys=[hands_id])
-    feet = relationship("Item", foreign_keys=[feet_id])
-    left_hand = relationship("Item", foreign_keys=[left_hand_id])
-    right_hand = relationship("Item", foreign_keys=[right_hand_id])
-    companion = relationship("Item", foreign_keys=[companion_id])
+
+    head = relationship(
+        "Item", foreign_keys=[head_id])
+    torso = relationship(
+        "Item", foreign_keys=[torso_id])
+    legs = relationship(
+        "Item", foreign_keys=[legs_id])
+    hands = relationship(
+        "Item", foreign_keys=[hands_id])
+    feet = relationship(
+        "Item", foreign_keys=[feet_id])
+    left_hand = relationship(
+        "Item", foreign_keys=[left_hand_id])
+    right_hand = relationship(
+        "Item", foreign_keys=[right_hand_id])
+    companion = relationship(
+        "Item", foreign_keys=[companion_id])
 
 
 engine = create_engine("sqlite:///InventoryCategories.db")
 Base.metadata.create_all(engine)
 
-engine = create_engine("sqlite:///TEST-DB.db")
-Base.metadata.create_all(engine)
