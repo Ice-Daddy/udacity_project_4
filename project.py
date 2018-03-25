@@ -266,7 +266,7 @@ def show_category(inv_name, category_id):
 @app.route(
     "/inventory/<string:inv_name>/category/new",
     methods=["POST"])
-def new_category(inv_name):
+def add_category(inv_name):
     inventory_id = get_inventory_type_id_by_inventory_name(inv_name)
     ctgry = categoryDB.add(
         name=request.form["name"],
@@ -343,7 +343,7 @@ def equip_item(inv_name, category_id, item_id):
 @app.route(
     "/inventory/<string:inv_name>/category/<int:category_id>/item/new",
     methods=["POST"])
-def new_item(inv_name, category_id):
+def add_item(inv_name, category_id):
     form = filter_form(request.form)
     try:
         form["image"] = get_and_store_picture(form["image"], inv_name)

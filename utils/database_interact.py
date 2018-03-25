@@ -54,9 +54,10 @@ class DBInteractor():
     def serialize_this(self):
         if hasattr(self.SQLclass, "serialize"):
             for row in self.read():
-                print row.serialize()
+                print(row.serialize())
+        else:
+            print('serialize method needs to be implemented')
         
-
 
 if __name__ == "__main__":
     from database_init import InventoryType, Category

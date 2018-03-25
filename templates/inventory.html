@@ -23,7 +23,7 @@
                 {% endif %}
 
                 {% if session["user_id"] %}
-                <form id="ctgry-form" class="form hidden" action="/inventory/{{inv_name}}/category/new" method="POST">
+                <form id="ctgry-form" class="form hidden" action="{{ url_for('add_category', inv_name=inv_name) }}" method="POST">
                     <div>
                         <label for="ctgry-name-input">Title:</label>
                         <br>
@@ -52,7 +52,7 @@
                 {% endfor %}
             </nav>
             <nav class="frame items">
-                {% if session["user_id"] %}
+                {% if session["user_id"] and category_id %}
                 <button class="new new-item">New</button>
                 {% endif %}
 
@@ -89,8 +89,8 @@
                 </div>
                 {% endif %}
 
-                {% if session["user_id"] %}
-                <form id="add-item-form" class="frame hidden" action="{{ url_for('add_item',inv_name=inv_name, category_id=category_id) }}" method="POST">
+                {% if session["user_id"] and category_id %}
+                <form id="add-item-form" class="frame hidden" action="{{ url_for('add_item', inv_name=inv_name, category_id=category_id) }}" method="POST">
                     <div class="form">
                         <label for="add-image-input">Image-URL:</label>
                         <br>
@@ -111,20 +111,20 @@
                     </div>
                 </form>
 
-                {% if item %}
+                {% if item and category_id %}
                 <form id="edit-item-form" class="frame hidden" action="{{ url_for('edit_item', inv_name=inv_name, category_id=category_id, item_id=item.id) }}" method="POST">
                     <div class="form">
                         <label for="image-input">Image-URL:</label>
                         <br>
-                        <input id="image-input" size="32" type="text" name="image" value="{{ item.image }}" disabled>
+                        <input id="edit-image-input" size="32" type="text" name="image" value="{{ item.image }}" disabled>
                         <br>
                         <label for="item-name-input">Title:</label>
                         <br>
-                        <input id="item-name-input" size="32" type="text" name="name" value="{{ item.name }}" required>
+                        <input id="edit-item-name-input" size="32" type="text" name="name" value="{{ item.name }}" required>
                         <br>
                         <label for="description-input">Description:</label>
                         <br>
-                        <textarea id="description-input" rows="8" cols="30" name="description" value="{{ item.description }}" required></textarea>
+                        <textarea id="edit-description-input" rows="8" cols="30" name="description" value="{{ item.description }}" required></textarea>
                         <br>
                         <div class="spread-apart">
                             <input class"cancel-item" type="submit" value="Edit">
@@ -139,19 +139,60 @@
         </div>
     </main>
 
+    {% if category_id %}
+    <script>
+        var categoryCRUDbasePath = "/inventory/{{inv_name}}/category/";
+
+        var $categoryForm = {
+            self: $('#ctgry-form'),
+            inputs: {
+                name: $('#ctgry-name-input')
+            },
+            prepareEdit: function(id) {
+                this.self.attr('action', categoryCRUDbasePath + id + '/edit');
+            },
+            prepareAdd: function() {
+                this.self.attr('action', categoryCRUDbasePath + "new/");
+            },
+            show: function() {this.self.removeClass('hidden')},
+            hide: function() {this.self.addClass('hidden')}
+        }
+
+        $('.new-category').click(function () {
+            var $form = $categoryForm;
+            $form.show();
+            $form.prepareAdd();
+        });
+
+        $('.edit-ctgry').click(function () {
+            var id = this.getAttribute("nbr");
+            var $form = $categoryForm;
+            $form.show();
+            $form.prepareEdit(id);
+        });
+
+        $('.delete-ctgry').click(function () {
+            var id = this.getAttribute("nbr");
+            if (confirm("Are you sure that you want to delete this category?")){
+                $.ajax({
+                    url: categoryCRUDbasePath + id + "/delete",
+                    type: "POST",
+                    success: function(response) {
+                        window.location = response;
+                    }
+                });
+            }
+        });
+
+
+    </script>
+    {% endif %}
+
+    {% if item %}
     <script>
         /*************************
          * Get input from Python *
          *************************
-
-        var imgPath = "{{ url_for('static', filename='img/{}/'.format(inv_name)) }}";
-        var newCategoryActionPath = "{{ url_for('new_category', inv_name=inv_name) }}";
-        var categoryCRUDbasePath = "{{ url_for('show_inventory', inv_name=inv_name) }}category/";
-        
-        {% if category_id %}
-        var newItemActionPath = "{{ url_for('new_item', inv_name=inv_name, category_id=category_id) }}";
-        var itemCRUDbasePath = "{{ url_for('show_category', inv_name=inv_name, category_id=category_id) }}item/";
-        {% endif %}
 
         var categories = {
             {% for c in categories %}
@@ -177,23 +218,6 @@
         /*****************
          * HTML Elements *
          *****************
-
-        var $categoryForm = {
-            self: $('#ctgry-form'),
-            inputs: {
-                name: $('#ctgry-name-input')
-            },
-            prepareEdit: function(id) {
-                this.self.attr('action', categoryCRUDbasePath + id + '/edit');
-                this.inputs.name.val(categories[id].name);
-            },
-            prepareAdd: function() {
-                this.self.attr('action', newCategoryActionPath);
-                this.inputs.name.val("");
-            },
-            show: function() {this.self.removeClass('hidden')},
-            hide: function() {this.self.addClass('hidden')}
-        };
 
         var $itemForm = {
             self: $('#item-form'),
@@ -250,32 +274,6 @@
          * JQuery Methods *
          *******************
 
-        $('.new-category').click(function () {
-            var $form = $categoryForm;
-            $form.show();
-            $form.prepareAdd();
-        });
-
-        $('.edit-ctgry').click(function () {
-            var id = this.getAttribute("nbr");
-            var $form = $categoryForm;
-            $form.show();
-            $form.prepareEdit(id);
-        });
-
-        $('.delete-ctgry').click(function () {
-            var id = this.getAttribute("nbr");
-            if (confirm("Are you sure that you want to delete this category?")){
-                $.ajax({
-                    url: categoryCRUDbasePath + id + "/delete",
-                    type: "POST",
-                    success: function(response) {
-                        window.location = response;
-                    }
-                });
-            }
-        });
-
         $('.cancel-ctgry').click(function () {
             $categoryForm.hide()
         });
@@ -319,41 +317,25 @@
         $('.cancel-item').click(function () {
             $itemForm.hide();
         });*/
-        {% if item %}
 
-        var itemID = {{ item.id }};
-        var equipURL = "{{ url_for("equip_item", inv_name=inv_name, category_id=category_id, item_id=item.id) }}";
+        var equipURL = "{{ url_for('equip_item', inv_name=inv_name, category_id=category_id, item_id=item.id) }}";
 
-        var $itemForm = {
-            self: $('#item-form'),
-            id: itemID,
-            inputs: {
-                imagePath: $('#image-input'),
-                name: $('#item-name-input'),
-                description: $('#description-input')
-            },
-            prepareEdit: function(item) {
-                this.self.attr('action', itemCRUDbasePath + this.id + '/edit');
-                for (field in this.inputs) {;
-                    this.inputs[field].val(item[field]);
-                }
-                this.inputs.imagePath.attr('disabled', '');
-                this.inputs.imagePath.removeAttr('required');
-            },
-            prepareAdd: function() {
-                this.self.attr('action', newItemActionPath);
-                for (field in this.inputs) {
-                    this.inputs[field].val("");
-                }
-                this.inputs.imagePath.removeAttr('disabled');
-                this.inputs.imagePath.attr('required', '');
-            },
+        var $addItemForm = {
+            self: $('#add-item-form'),
             show: function() {this.self.removeClass('hidden')},
-            hide: function() {this.self.addClass('hidden')},
-            update: function(id) {
-                this.id = id;
-            }
+            hide: function() {this.self.addClass('hidden')}
         };
+
+        var $editItemForm = {
+            self: $('#edit-item-form'),
+            show: function() {this.self.removeClass('hidden')},
+            hide: function() {this.self.addClass('hidden')}
+        };
+
+        $(".new-item").click(function(){
+            $editItemForm.hide();
+            $addItemForm.show();
+        });
 
         $(".equip-item").click(function(){
             $.ajax({
@@ -368,8 +350,8 @@
         $(".cancel-item").click(function(){
             $(".item.form").hide();
         })
-        {% endif %}
     </script>
+    {% endif %}
 </body>
 
 </html>
