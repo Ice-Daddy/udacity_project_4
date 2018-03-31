@@ -18,9 +18,10 @@ class GConnect():
         self.session = session
         self.CLIENT_ID = json.loads(open(
             json_path, "r").read())["web"]["client_id"]
-        self.access_token = ""
-        self.gplus_id = ""
-        self.data = ""
+        self.access_token = None
+        self.gplus_id = None
+        self.data = None
+        self.response = None
 
     def gconnect(self, data):
         self.ask_Google_for_user_data(data)
@@ -63,7 +64,8 @@ class GConnect():
             self.dump_runtime_error(
                 "Current user is already connected.", 200)
 
-    def send_token_to_google(self, url):
+    @staticmethod
+    def send_token_to_google(url):
         h = Http()
         return h.request(url, "GET")
 
@@ -82,8 +84,9 @@ class GConnect():
             )
         googleapi_url = "https://accounts.google.com/o/oauth2/revoke?token="
         url = "{}{}".format(googleapi_url, access_token)
-        results = self.send_token_to_google(url)[0]
-        if results["status"] == "200":
+        results = self.send_token_to_google(url)
+        print(results)
+        if results[0]["status"] == "200":
             return True
         else:
             self.dump_runtime_error(

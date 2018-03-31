@@ -1,37 +1,52 @@
 
 from flask import Flask, render_template, request, redirect,\
-    jsonify, flash, url_for, session as login_session
+    jsonify, flash, url_for, abort, session as login_session
 from sqlalchemy.orm.exc import NoResultFound
 from hashlib import sha256
 from os import urandom, remove
 from uuid import uuid4
 
 from utils.pixelate import Pixelator
-from utils.GoogleConnect import GConnect
+from utils.google_connect import GConnect
 from utils.database_interact import DBInteractor
 from utils.database_init import InventoryType, Category, Item, User, Skin
 
 app = Flask(__name__)
 
 # Database operation Helpers
-
-
 inventoryDB = DBInteractor(InventoryType)
 categoryDB = DBInteractor(Category)
 userDB = DBInteractor(User)
 itemDB = DBInteractor(Item)
 skinDB = DBInteractor(Skin)
 
-body_parts = ["head", "torso", "legs", "hands", "feet",
-              "left_hand", "right_hand", "companion"]
+body_parts = ["head", "torso", "legs",
+              "hands", "feet", "left_hand",
+              "right_hand", "companion"]
 
+
+#########################
+# CSRF Security Methods #
+#########################
 
 def create_csrf_token():
-    if not login_session.get("state"):
-        for part in body_parts:
-            login_session[part] = 0
     state = sha256(urandom(1024)).hexdigest()
     login_session["state"] = state
+
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = login_session.pop('state', None)
+        if not token or token != request.form.get('_csrf_token'):
+            print("Token was {} but we expected {}".format(
+                request.form.get("_csrf_token"), token
+            ))
+            abort(403)
+
+
+def get_csrf_token():
+    return login_session["state"]
 
 
 ##############################
@@ -58,8 +73,8 @@ def gconnect():
         login_session["gplus_id"] = gplus_id
         login_session["username"] = data["name"]
         login_session["email"] = data["email"]
-        login_session["user_id"] = getUserID(login_session["email"],
-                                             createUser, login_session)
+        login_session["user_id"] = get_user_id(login_session["email"],
+                                               create_user, login_session)
         return redirect(url_for("main_page"))
 
 
@@ -67,7 +82,7 @@ def gconnect():
 def gdisconnect():
     access_token = login_session["access_token"]
     user_token_revoked = GoogleOAuthWrapper.gdisconnect(access_token)
-    if (user_token_revoked):
+    if user_token_revoked:
         del login_session["access_token"]
         del login_session["gplus_id"]
         del login_session["username"]
@@ -82,7 +97,7 @@ def gdisconnect():
 
 @app.route("/admin")
 def print_session():
-    create_csrf_token()
+    """ Some means to make the Server state visible in browser """
     output = "{<br>"
     for x in login_session.__iter__():
         output += "    {}: {}<br>".format(x, login_session[x])
@@ -94,16 +109,16 @@ def print_session():
     return output
 
 
-@app.route("/api/all_categories/")
-def list_all_categories():
-    categories = categoryDB.read()
-    return jsonify({c.id: c.serialize() for c in categories})
+@app.route("/api/skin/<int:skin_id>")
+def list_all_categories(skin_id):
+    skin = skinDB.filter(id=skin_id).one()
+    return jsonify({part: getattr(skin, part).serialize() for part in body_parts})
 
 
-@app.route("/api/all_items/")
-def list_all_items():
-    items = itemDB.read()
-    return jsonify({i.id: i.serialize() for i in items})
+@app.route("/api/item/<int:item_id>")
+def show_item_detail(item_id):
+    item = itemDB.filter(id=item_id).one()
+    return jsonify(item.serialize())
 
 
 @app.route("/api/inventory/<string:inv_name>/categories/")
@@ -116,23 +131,20 @@ def list_categories_of_inventory(inv_name):
 @app.route("/api/inventory/<string:inv_name>/items/")
 def list_items_of_inventory(inv_name):
     id = get_inventory_type_id_by_inventory_name(inv_name)
-    print(id)
     category_ids = categoryDB.session.query(Category.id).\
         filter(Category.inventory_type_id == id)
-    print(category_ids)
     items = itemDB.session.query(Item).filter(Item.category_id.in_(category_ids))
     return jsonify(items=[i.serialize() for i in items])
 
 
-@app.route("/api/inventory/<string:inv_name>/category/<int:category_id>/")
-def list_items_of_category(inv_name, category_id):
-    items = itemDB.filter(category_id=category_id).all()
-    return jsonify(items=[i.serialize() for i in items])
-
-
 ############################
-# Main site and categories #
+# Main site and Skins #
 ############################
+
+# Skins are a set of inventory items that were saved
+# to form a specific set of clothes like a full body
+# costume.
+
 
 @app.route("/")
 def main_page():
@@ -147,14 +159,10 @@ def main_page():
     )
 
 
-###########################
-# Create and Delete Skins #
-###########################
-
 @app.route("/inventory/skin/<int:skin_id>")
 def open_skin(skin_id):
     create_csrf_token()
-    get_images_by_skin_id(skin_id)
+    authenticated = get_images_by_skin_id_and_authenticate(skin_id)
     character = get_character_inventory()
     skins = skinDB.read()
     return render_template(
@@ -162,31 +170,20 @@ def open_skin(skin_id):
         session=login_session,
         character=character,
         skins=skins,
-        skin_id=skin_id
+        skin_id=skin_id,
+        authenticated=authenticated
     )
 
 
-@app.route(
-    "/inventory/skin/save", methods=["POST"])
-def save_skin():
-    current_skin = {body_part + "_id": login_session[body_part]
-                    for body_part in body_parts}
-    current_skin["user_id"] = 1 #TODO login_session["user_id"]
-    current_skin["title"] = request.form["name"]
-    skinDB.add(**current_skin)
-    return redirect(url_for("main_page"))
-
-
-@app.route(
-    "/inventory/skin/<int:skin_id>/delete", methods=["POST"])
-def delete_skin(skin_id):
-    skinDB.delete(id=skin_id)
-    return "success"
-
-
-def get_current_skin():
-    return {body_part: login_session[body_part]
-            for body_part in body_parts}
+def get_images_by_skin_id_and_authenticate(skin_id):
+    item_set = skinDB.filter(id=skin_id).one()
+    for body_part in body_parts:
+        try:
+            item_id = getattr(item_set, body_part).id
+            login_session[body_part] = item_id
+        except AttributeError:
+            login_session[body_part] = 0
+    return item_set.user_id == login_session["user_id"]
 
 
 def get_character_inventory():
@@ -195,51 +192,59 @@ def get_character_inventory():
 
 
 def get_item_info_by_body_part(body_part):
-    id = login_session[body_part]
-    item_info = item_or_default_item(id)
+    item_id = login_session[body_part]
+    item_info = item_or_default_item(item_id)
     return item_info
 
 
-def item_or_default_item(id):
-    print(id)
-    if id == 0:
+def item_or_default_item(item_id):
+    if item_id == 0:
         return {
             "image": "default.png",
             "description": ""
         }
-    item = itemDB.filter(id=id).one()
+    item = itemDB.filter(id=item_id).one()
     return {
         "image": item.image,
         "description": item.description
     }
 
 
-def get_images_by_skin_id(skin_id):
-    item_set = skinDB.filter(id=skin_id).one()
-    for body_part in body_parts:
-        try:
-            id = getattr(item_set, body_part).id
-            login_session[body_part] = id
-        except AttributeError:
-            login_session[body_part] = 0
-    print(login_session)
+@app.route(
+    "/inventory/skin/save", methods=["POST"])
+def save_skin():
+    current_skin = {body_part + "_id": login_session[body_part]
+                    for body_part in body_parts}
+    current_skin["user_id"] = login_session["user_id"]
+    current_skin["title"] = request.form["name"]
+    skinDB.add(**current_skin)
+    return redirect(url_for("main_page"))
 
 
-################################
-# Add, Edit, Delete Categories #
-################################
+@app.route(
+    "/inventory/skin/<int:skin_id>/delete", methods=["POST"])
+def delete_skin(skin_id):
+    delete_candidate = skinDB.filter(id=skin_id).one()
+    if is_not_authenticated(delete_candidate.user_id):
+        return "failure"
+    skinDB.session.delete(delete_candidate)
+    skinDB.session.commit()
+    return "success"
+
+
+##################
+# Category Layer #
+##################
 
 @app.route("/inventory/<string:inv_name>/")
 def show_inventory(inv_name):
     create_csrf_token()
     categories = get_categories_by_inventory_name(inv_name)
-    authorized = get_authorized_entities(categories)
     return render_template(
         "inventory.html",
         session=login_session,
         inv_name=inv_name,
         categories=categories,
-        authorized=authorized,
         items=[]
     )
 
@@ -250,39 +255,44 @@ def show_category(inv_name, category_id):
     categories = get_categories_by_inventory_name(inv_name)
     items = get_items_by_category_id(category_id)
     item = get_item_by_item_id(request.args.get("item"))
-    authorized = get_authorized_entities(categories, items)
     return render_template(
         "inventory.html",
-        category_id=category_id,
         session=login_session,
         inv_name=inv_name,
-        item=item,
         categories=categories,
         items=items,
-        authorized=authorized
+        category_id=category_id,
+        item=item
     )
 
+
+################################
+# Add, Edit, Delete Categories #
+################################
 
 @app.route(
     "/inventory/<string:inv_name>/category/new",
     methods=["POST"])
 def add_category(inv_name):
     inventory_id = get_inventory_type_id_by_inventory_name(inv_name)
-    ctgry = categoryDB.add(
+    category = categoryDB.add(
         name=request.form["name"],
-        user_id=1, #TODO login_session["user_id"]
+        user_id=login_session["user_id"],
         inventory_type_id=inventory_id
     )
     flash("New Category {} added.".format(request.form["name"]))
     return redirect(url_for(
-        "show_category", inv_name=inv_name, category_id=ctgry.id))
+        "show_category", inv_name=inv_name, category_id=category.id))
 
 
 @app.route(
     "/inventory/<string:inv_name>/category/<int:category_id>/edit",
     methods=["POST"])
 def edit_category(inv_name, category_id):
-    updates = filter_form(request.form)
+    updates = filter_form(request.form, ["name"])
+    category = categoryDB.filter(id=category_id).one()
+    if is_not_authenticated(category.user_id):
+        return
     categoryDB.update({"id": category_id}, updates)
     return redirect(url_for(
         "show_category", inv_name=inv_name, category_id=category_id))
@@ -292,7 +302,11 @@ def edit_category(inv_name, category_id):
     "/inventory/<string:inv_name>/category/<int:category_id>/delete",
     methods=["POST"])
 def delete_category(inv_name, category_id):
-    categoryDB.delete(id=category_id)
+    category = categoryDB.filter(id=category_id).one()
+    if is_not_authenticated(category.user_id):
+        return
+    categoryDB.session.delete(category)
+    categoryDB.session.commit()
     for item in get_items_by_category_id(category_id):
         itemDB.delete(id=item.id)
     return url_for(
@@ -300,16 +314,6 @@ def delete_category(inv_name, category_id):
         inv_name=inv_name
     )
 
-def get_authorized_entities(categories, items=[]):
-    user_id = login_session.get("user_id")
-    authorized_categories = [c.id for c in categories
-                              if c.user_id == user_id]
-    authorized_items = [i.id for i in items
-                              if i.user_id == user_id]
-    return {
-        "categories": authorized_categories,
-        "items": authorized_items
-    }
 
 #####################
 # Single Item Layer #
@@ -335,7 +339,6 @@ def show_item_details(inv_name, category_id, item_id):
     "item/<int:item_id>/equip",
     methods=["POST"])
 def equip_item(inv_name, category_id, item_id):
-    image = itemDB.filter(id=item_id).one().image
     login_session[inv_name] = item_id
     return url_for("main_page")
 
@@ -344,7 +347,7 @@ def equip_item(inv_name, category_id, item_id):
     "/inventory/<string:inv_name>/category/<int:category_id>/item/new",
     methods=["POST"])
 def add_item(inv_name, category_id):
-    form = filter_form(request.form)
+    form = filter_form(request.form, ["name", "image", "description"])
     try:
         form["image"] = get_and_store_picture(form["image"], inv_name)
     except IOError or ValueError:
@@ -364,14 +367,15 @@ def add_item(inv_name, category_id):
 
 def insert_new_item_to_database(form, category_id):
     form["category_id"] = category_id
-    form["user_id"] = 1 #TODO login_session["user_id"]
+    form["user_id"] = login_session["user_id"]
     return itemDB.add(**form)
 
 
 def get_and_store_picture(url, inv_name):
     name = "{}.png".format(str(uuid4()))
-    filename = "img/{}/{}".format(inv_name, name)
-    add_new_picture(url, url_for("static", filename=filename))
+    file_path = "./static/img/{}/{}".format(inv_name, name)
+    px = Pixelator()
+    px.pixelate_url(url, file_path)
     return name
 
 
@@ -380,14 +384,17 @@ def get_and_store_picture(url, inv_name):
     "item/<int:item_id>/edit",
     methods=["POST"])
 def edit_item(inv_name, category_id, item_id):
-    updates = filter_form(request.form)
+    updates = filter_form(request.form, ["name", "description"])
+    item = itemDB.filter(id=item_id).one()
+    if is_not_authenticated(item.user_id):
+        return
     itemDB.update({"id": item_id}, updates)
-    return url_for(
+    return redirect(url_for(
         "show_item_details",
         inv_name=inv_name,
         category_id=category_id,
         item_id=item_id
-    )
+    ))
 
 
 @app.route(
@@ -395,10 +402,13 @@ def edit_item(inv_name, category_id, item_id):
     "item/<int:item_id>/delete",
     methods=["POST"])
 def delete_item(inv_name, category_id, item_id):
-    print("Delete Item with ID " + str(item_id))
+    item = itemDB.filter(id=item_id).one()
+    if is_not_authenticated(item.user_id):
+        return
     item_name = get_item_by_item_id(item_id).image
     remove_picture("img/{}/{}".format(inv_name, item_name))
     remove_item_from_skins(inv_name, item_id)
+    remove_item_from_session(inv_name, item_id)
     itemDB.delete(id=item_id)
     return url_for(
         "show_category",
@@ -443,28 +453,33 @@ def get_item_by_item_id(item_id):
 
 # picture handling
 
-px = Pixelator()
-
-
-def add_new_picture(url, path):
-    px.pixelate_url(url, "./" + path)
-
-
 def remove_picture(path):
     remove("./" + url_for(
         "static", filename=path))
 
 
 def remove_item_from_skins(inv_name, item_id):
-    inv_id = "{}_id".filter(inv_name)
-    skinDB.session.query(Skin).filter(
+    inv_id = "{}_id".format(inv_name)
+    skins_with_said_item = skinDB.session.query(Skin).filter(
         getattr(Skin, inv_id) == item_id
-    ).update({inv_id: 0})
+    ).all()
+    for skin in skins_with_said_item:
+        setattr(skin, inv_id, 0)
+    skinDB.session.commit()
+
+
+def remove_item_from_session(inv_name, item_id):
+    if login_session[inv_name] == item_id:
+        login_session[inv_name] = 0
 
 
 # user handling
 
-def getUserID(email, callback, input):
+def is_not_authenticated(user_id):
+    return user_id != login_session["user_id"]
+
+
+def get_user_id(email, callback, input):
     try:
         user = userDB.filter(email=email).one()
         return user.id
@@ -472,11 +487,7 @@ def getUserID(email, callback, input):
         return callback(input)
 
 
-def getUserInfo(user_id):
-    return userDB.filter(id=user_id).one()
-
-
-def createUser(login_session):
+def create_user(login_session):
     userDB.add(
         name=login_session["username"],
         email=login_session["email"]
@@ -487,14 +498,15 @@ def createUser(login_session):
 
 # misc
 
-def filter_form(form):
-    return {field: entry
-            for field, entry in form.iteritems() if entry}
+def filter_form(form, keys):
+    return {key: form[key] for key in keys}
 
 
 if __name__ == "__main__":
     app.secret_key = """\x17\x9a\xf7\x8a\xbe\x90\xe6T\xa6\x80
     \x84\x04)\x81\xef\xee"\xee\x84\xeeuE\x9bO\x92Y\x13F\x92{u
     \xc8\x0f\xf3E\x1c\"`J\xe4=k\x12\x17Ko\x0b\x7fL0#9iF4a1"""
+
+    app.jinja_env.globals['csrf_token'] = get_csrf_token
     app.debug = True
     app.run(host="0.0.0.0", port=5000)

@@ -6,9 +6,11 @@
     </div>
     <div class="user">
         {% if session.username %} 
-        <p>Hello, <b>{{ session.username }}</b>, enjoy hacking away :-)</p>
+        <p style="color:orange;">Hello, <b>{{ session.username }}</b>, enjoy hacking away ^3^</p>
         <form action="/gdisconnect" method="post">
-            <input class="signout" type="submit" value="sign out">
+            <div class="signin">
+                <input class="signout" type="submit" value="sign out">
+            </div>
         </form>
         {% else %}
         <form id="signinButton" method="post" action="https://accounts.google.com/o/oauth2/auth?" >
@@ -24,7 +26,6 @@
                 <input type="submit" value="Signin   with   Google" />
             </div>
         </form>
-        <div id="result"></div>
 
         <script>
             function signInCallback(authResult) {
