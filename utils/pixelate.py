@@ -3,30 +3,25 @@ from urllib2 import urlopen
 
 
 class Pixelator():
+    """
+    Util class to quickly download and resize pictures from the web.
+    """
+    def __init__(self):
+        self.image = None
+
     def __download(self, url):
         self.image = Image.open(urlopen(url))
 
-    def __open(self, file_path):
-        self.image = Image.open(file_path)
-
     def __calculate_factor(self):
         max_pixel = max(self.image.size)
-        return max_pixel // 100
+        return max_pixel // 100  # Want the result to be about 100px wide or high, not more
 
     def __pixelate(self, output_path):
         height, width = self.image.size
         factor = self.__calculate_factor()
         self.image = self.image.resize((height // factor, width // factor),
                                        Image.NEAREST)
-        #       self.image = self.image.resize(
-        #           (height * factor, width * factor),
-        #           Image.NEAREST
-        #       )
         self.image.save(output_path)
-
-    def pixelate_locally(self, input_path, output_path):
-        self.__open(input_path)
-        self.__pixelate(output_path)
 
     def pixelate_url(self, url, output_path):
         self.__download(url)
@@ -105,4 +100,4 @@ if __name__ == '__main__':
         try:
             px.pixelate_url(url, loc + path)
         except:
-            print("skipped one image")
+            print("skipped one image: " + url)

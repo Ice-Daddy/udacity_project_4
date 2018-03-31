@@ -2,17 +2,53 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ce1b59e6-71e2-4ac5-b29f-aa087d1b5f22" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/README.md" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/project.py" afterPath="$PROJECT_DIR$/project.py" />
-      <change beforePath="$PROJECT_DIR$/static/css/style.css" afterPath="$PROJECT_DIR$/static/css/style.css" />
-      <change beforePath="$PROJECT_DIR$/static/img/head/23c965fc-cd4b-478e-b512-f917a3be58bc.png" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/static/img/head/85f24591-966f-4dba-8b73-563365757b03.png" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/templates/header.html" afterPath="$PROJECT_DIR$/templates/header.html" />
-      <change beforePath="$PROJECT_DIR$/templates/inventory.html" afterPath="$PROJECT_DIR$/templates/inventory.html" />
-      <change beforePath="$PROJECT_DIR$/templates/main.html" afterPath="$PROJECT_DIR$/templates/main.html" />
-      <change beforePath="$PROJECT_DIR$/utils/GoogleConnect.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/google.py" afterPath="$PROJECT_DIR$/utils/testAPI.py" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" afterPath="$PROJECT_DIR$/requirements.txt" />
+      <change beforePath="$PROJECT_DIR$/static/img/Logo.xcf" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/companion/a2aca75c-de75-41d2-ae14-71873488212b.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/companion/charmander.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/companion/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/companion/pikachu.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/companion/raichu.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/feet/39da11df-64de-47bd-9620-7970f8a38137.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/feet/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/feet/running_shoes.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/feet/scooberdiver_shoes.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/feet/tennis_shoes.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/hands/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/hands/hand_knit_gloves.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/hands/metal_gloves.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/hands/red_gloves.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/70a5d86d-64a3-4993-a99c-92b8f94d90a9.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/c1ba36c6-36f8-4a8c-82e4-092f0d7df58f.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/medieval_helmet.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/simple_leather_helmet.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/head/viking_helmet.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/05c96ca0-2254-4da4-82aa-a073f7e601f7.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/37a8ee24-7589-4349-9f6c-4d9426911f39.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/tambourine.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/triangle.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/left_hand/trombone.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/legs/8ec305d7-a684-430c-a801-e25f202062fb.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/legs/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/legs/groovy_glittery_pants.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/legs/leather_punk_pants.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/legs/ripped_jeans.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/right_hand/446086ae-7a5d-4c80-a061-11ae26af5629.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/right_hand/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/right_hand/hacksaw.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/right_hand/screwdriver.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/right_hand/spade.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/3563ffcf-4df8-4819-8a62-0a1d5c4b5014.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/7a83eba7-59bd-47a7-a6dc-26678477c88f.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/default.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/metal_shirt.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/pink_t-shirt.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/static/img/torso/sweat_soaked_shirt.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/utils/pixelate.py" afterPath="$PROJECT_DIR$/utils/pixelate.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -58,12 +94,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="0">
-                <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <first_editor relative-caret-position="238">
+                <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -71,14 +107,34 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pixelate.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/pixelate.py">
+      <file leaf-file-name="requirements.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pixelate.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utils/pixelate.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-662">
+              <caret line="15" column="40" lean-forward="true" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/static/img/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="7" lean-forward="false" selection-start-line="7" selection-start-column="7" selection-end-line="7" selection-end-column="7" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -96,7 +152,7 @@
       <file leaf-file-name="flood_database.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/flood_database.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
+            <state relative-caret-position="68">
               <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
               <folding>
                 <element signature="e#0#42#0" expanded="true" />
@@ -137,7 +193,6 @@
       <find>add_new_pi</find>
       <find>remove_item</find>
       <find>remove_</find>
-      <find>api</find>
       <find>csrf</find>
       <find>item_or_de</find>
       <find>get_character_inventory</find>
@@ -146,6 +201,7 @@
       <find>getUserInfo</find>
       <find>print</find>
       <find>filter_form</find>
+      <find>api</find>
     </findStrings>
     <replaceStrings>
       <replace>authorized</replace>
@@ -173,10 +229,14 @@
         <option value="$PROJECT_DIR$/utils/testAPI.py" />
         <option value="$PROJECT_DIR$/project.py" />
         <option value="$PROJECT_DIR$/project.py" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/utils/pixelate.py" />
+        <option value="$PROJECT_DIR$/static/img/.gitignore" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-27" />
     <option name="width" value="1272" />
     <option name="height" value="692" />
   </component>
@@ -203,6 +263,22 @@
             <path>
               <item name="udacity_project_4" type="b2602c69:ProjectViewProjectNode" />
               <item name="udacity_project_4" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="udacity_project_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="udacity_project_4" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="udacity_project_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="udacity_project_4" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="img" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="udacity_project_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="udacity_project_4" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -304,16 +380,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1044" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1078125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16822916" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23780487" sideWeight="0.49791667" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32657418" sideWeight="0.48958334" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32657418" sideWeight="0.5104167" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32657418" sideWeight="0.47291666" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32657418" sideWeight="0.52708334" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27321237" sideWeight="0.49583334" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.66614586" sideWeight="0.50208336" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.8404088" sideWeight="0.50208336" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -341,8 +418,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../templates/inventory.html" />
-    <entry file="file://$PROJECT_DIR$/../templates/main.html" />
     <entry file="file://$PROJECT_DIR$/../project.py" />
     <entry file="file://$PROJECT_DIR$/../static/css/inventory.css" />
     <entry file="file://$PROJECT_DIR$/../static/css/main.css" />
@@ -391,16 +466,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils/flood_database.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/main.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -421,24 +486,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="295">
           <caret line="86" column="8" lean-forward="false" selection-start-line="86" selection-start-column="8" selection-end-line="86" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/pixelate.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -496,14 +543,55 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utils/flood_database.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <first_editor relative-caret-position="238">
+            <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
             <folding />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/img/legs/8ec305d7-a684-430c-a801-e25f202062fb.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/pixelate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-662">
+          <caret line="15" column="40" lean-forward="true" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/img/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="7" lean-forward="false" selection-start-line="7" selection-start-column="7" selection-end-line="7" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>
