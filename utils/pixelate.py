@@ -1,34 +1,47 @@
 from PIL import Image
-from urllib2 import urlopen
+from urllib import urlopen
+from os import mkdir, getcwd
 
 
-class Pixelator():
+class PictureResizer():
     """
     Util class to quickly download and resize pictures from the web.
     """
-    def __init__(self):
+    def __init__(self, rough_size=150):
         self.image = None
+        self.ROUGH_FINAL_SIZE = rough_size
 
     def __download(self, url):
         self.image = Image.open(urlopen(url))
 
     def __calculate_factor(self):
+        """
+        returns factor by which to scale an image
+        to roughly get ROUGH_FINAL_SIZE
+        """
         max_pixel = max(self.image.size)
-        return max_pixel // 100  # Want the result to be about 100px wide or high, not more
+        return max_pixel // self.ROUGH_FINAL_SIZE
 
-    def __pixelate(self, output_path):
+    def __resize(self, output_path):
         height, width = self.image.size
         factor = self.__calculate_factor()
         self.image = self.image.resize((height // factor, width // factor),
                                        Image.NEAREST)
         self.image.save(output_path)
 
-    def pixelate_url(self, url, output_path):
+    def resize_url(self, url, output_path):
         self.__download(url)
-        self.__pixelate(output_path)
+        self.__resize(output_path)
 
 
 if __name__ == '__main__':
+    """
+    Download initial pictures
+    """
+    inv_names = [
+        "head", "torso", "left_hand", "right_hand",
+        "hands", "feet", "legs", "companion"
+    ]
     inventory = [
         ("https://free.clipartof.com/1729-Free-Clipart-Of-A-Pair-Of-Mens-Shoes.png",
          "feet/default.png"),
@@ -94,8 +107,11 @@ if __name__ == '__main__':
         ("https://i1.wp.com/pokemongoden.com/wp-content/uploads/2016/07/Charmander-Pokedex.png?fit=250%2C282",
          "companion/charmander.png")
     ]
-    px = Pixelator()
-    loc = '/home/moritz/Desktop/Programming/udacity/git/pkg/static/img/'
+    print(getcwd())
+    loc = getcwd() + '/static/img/'
+    # for name in inv_names:
+        #  mkdir(loc + name)
+    px = PictureResizer()
     for url, path in inventory:
         try:
             px.pixelate_url(url, loc + path)

@@ -6,7 +6,7 @@ from hashlib import sha256
 from os import urandom, remove
 from uuid import uuid4
 
-from utils.pixelate import Pixelator
+from utils.pixelate import PictureResizer
 from utils.google_connect import GConnect
 from utils.database_interact import DBInteractor
 from utils.database_init import InventoryType, Category, Item, User, Skin
@@ -25,6 +25,22 @@ body_parts = ["head", "torso", "legs",
               "right_hand", "companion"]
 
 
+def init():
+    for part in body_parts:
+        login_session[part] = {
+            "image": "default.png",
+            "id": 0
+        }
+
+
+@app.before_request
+def prepare_session_and_csrf_check():
+    if not "state" in login_session:
+        init()
+    csrf_protect()
+    create_csrf_token()
+
+
 #########################
 # CSRF Security Methods #
 #########################
@@ -34,7 +50,6 @@ def create_csrf_token():
     login_session["state"] = state
 
 
-@app.before_request
 def csrf_protect():
     if request.method == "POST":
         token = login_session.pop('state', None)
@@ -148,7 +163,6 @@ def list_items_of_inventory(inv_name):
 
 @app.route("/")
 def main_page():
-    create_csrf_token()
     skins = skinDB.read()
     character = get_character_inventory()
     return render_template(
@@ -161,8 +175,7 @@ def main_page():
 
 @app.route("/inventory/skin/<int:skin_id>")
 def open_skin(skin_id):
-    create_csrf_token()
-    authenticated = get_images_by_skin_id_and_authenticate(skin_id)
+    authenticated = load_item_ids_into_session_and_authenticate(skin_id)
     character = get_character_inventory()
     skins = skinDB.read()
     return render_template(
@@ -175,7 +188,7 @@ def open_skin(skin_id):
     )
 
 
-def get_images_by_skin_id_and_authenticate(skin_id):
+def load_item_ids_into_session_and_authenticate(skin_id):
     item_set = skinDB.filter(id=skin_id).one()
     for body_part in body_parts:
         try:
@@ -187,6 +200,10 @@ def get_images_by_skin_id_and_authenticate(skin_id):
 
 
 def get_character_inventory():
+    """
+    Gets Image and description for each bodw part
+    according according to the login_session
+    """
     return {body_part: get_item_info_by_body_part(body_part)
             for body_part in body_parts}
 
@@ -238,7 +255,6 @@ def delete_skin(skin_id):
 
 @app.route("/inventory/<string:inv_name>/")
 def show_inventory(inv_name):
-    create_csrf_token()
     categories = get_categories_by_inventory_name(inv_name)
     return render_template(
         "inventory.html",
@@ -251,7 +267,6 @@ def show_inventory(inv_name):
 
 @app.route("/inventory/<string:inv_name>/category/<int:category_id>/")
 def show_category(inv_name, category_id):
-    create_csrf_token()
     categories = get_categories_by_inventory_name(inv_name)
     items = get_items_by_category_id(category_id)
     item = get_item_by_item_id(request.args.get("item"))
@@ -365,18 +380,18 @@ def add_item(inv_name, category_id):
     ))
 
 
+def get_and_store_picture(url, inv_name):
+    name = "{}.png".format(str(uuid4()))
+    file_path = "./static/img/{}/{}".format(inv_name, name)
+    px = PictureResizer()
+    px.pixelate_url(url, file_path)
+    return name
+
+
 def insert_new_item_to_database(form, category_id):
     form["category_id"] = category_id
     form["user_id"] = login_session["user_id"]
     return itemDB.add(**form)
-
-
-def get_and_store_picture(url, inv_name):
-    name = "{}.png".format(str(uuid4()))
-    file_path = "./static/img/{}/{}".format(inv_name, name)
-    px = Pixelator()
-    px.pixelate_url(url, file_path)
-    return name
 
 
 @app.route(
@@ -417,6 +432,26 @@ def delete_item(inv_name, category_id, item_id):
     )
 
 
+def remove_picture(path):
+    remove("./" + url_for(
+        "static", filename=path))
+
+
+def remove_item_from_skins(inv_name, item_id):
+    inv_id = "{}_id".format(inv_name)
+    skins_with_said_item = skinDB.session.query(Skin).filter(
+        getattr(Skin, inv_id) == item_id
+    ).all()
+    for skin in skins_with_said_item:
+        setattr(skin, inv_id, 0)
+    skinDB.session.commit()
+
+
+def remove_item_from_session(inv_name, item_id):
+    if login_session[inv_name] == item_id:
+        login_session[inv_name] = 0
+
+
 ##################
 # Util functions #
 ##################
@@ -451,28 +486,6 @@ def get_item_by_item_id(item_id):
         ).one()
 
 
-# picture handling
-
-def remove_picture(path):
-    remove("./" + url_for(
-        "static", filename=path))
-
-
-def remove_item_from_skins(inv_name, item_id):
-    inv_id = "{}_id".format(inv_name)
-    skins_with_said_item = skinDB.session.query(Skin).filter(
-        getattr(Skin, inv_id) == item_id
-    ).all()
-    for skin in skins_with_said_item:
-        setattr(skin, inv_id, 0)
-    skinDB.session.commit()
-
-
-def remove_item_from_session(inv_name, item_id):
-    if login_session[inv_name] == item_id:
-        login_session[inv_name] = 0
-
-
 # user handling
 
 def is_not_authenticated(user_id):
@@ -503,9 +516,7 @@ def filter_form(form, keys):
 
 
 if __name__ == "__main__":
-    app.secret_key = """\x17\x9a\xf7\x8a\xbe\x90\xe6T\xa6\x80
-    \x84\x04)\x81\xef\xee"\xee\x84\xeeuE\x9bO\x92Y\x13F\x92{u
-    \xc8\x0f\xf3E\x1c\"`J\xe4=k\x12\x17Ko\x0b\x7fL0#9iF4a1"""
+    app.secret_key = sha256(urandom(2048)).hexdigest()
 
     app.jinja_env.globals['csrf_token'] = get_csrf_token
     app.debug = True

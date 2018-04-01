@@ -5,6 +5,9 @@ from database_init import Base
 
 
 class DBInteractor():
+    """
+    Utility classes to make sqlalchemy code look a little bit nicer
+    """
     def __init__(self, SQLclass, database='sqlite:///InventoryCategories.db'):
         engine = create_engine(database)
         Base.metadata.bind = engine
@@ -39,6 +42,9 @@ class DBInteractor():
             self.session.delete(row)
 
     def print_this(self):
+        """
+        helper method for manually checking the database
+        """
         output = ""
         index = 1
         for row in self.read():

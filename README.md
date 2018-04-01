@@ -8,16 +8,19 @@ skins created that way.
 
 ## Setup
 
-To install execute `pip install requirements.txt` within the folder to install the required
-Python packages. To create the database and fill it with sample data, run 
+This application only works with Python2 because urllib2 is a requirement.
+
+To install dependencies, execute `pip install requirements.txt` within the folder to install the required
+Python packages. Then run the following two commands.
 ```
-pip install requirements.txt
-python utils/
+python utils/pixelate.py
 python utils/flood_database.py
 ```
+They will prepare the database and download pictures that will be used for the Prototype
+
 Then run the app locally by typing
 `python project.py` and point your browser to [localhost:5000](localhost:5000/)
 
 ## Tests
 
-Sadly no Unittests but one may test the api quickly by running `python utils/testAPI.py`
+Sadly no Unittests - but one may test the api quickly by running `python utils/testAPI.py`
